@@ -1,0 +1,83 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+
+{{- if index .Values "eric-eo-so-nssmf-agent" "enabled" }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ template "eric-esoa-so.name" . }}-nssmf-agent-rbac-configmap
+  labels:
+    app: {{ template "eric-esoa-so.name" . }}
+  {{- include "eric-esoa-so.kubernetes-io-info" .| nindent 4 }}
+    com.ericsson.bss/bam-global-rbac: {{ .Values.rbac.label }}
+  annotations:
+  {{- include "eric-esoa-so.helm-annotations" .| nindent 4 }}
+data:
+  rbac: |
+    policy:
+      nssmf-user-1:
+        PType: p
+        V0: SOUser
+        V1: /nssmf-agent/*
+        V2: get
+      nssmf-user-2:
+        PType: p
+        V0: SOUser
+        V1: /nssmf-agent/*
+        V2: create
+      nssmf-user-3:
+        PType: p
+        V0: SOUser
+        V1: /nssmf-agent/*
+        V2: delete
+      nssmf-admin-1:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /nssmf-agent/*
+        V2: get
+      nssmf-admin-2:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /nssmf-agent/*
+        V2: create
+      nssmf-admin-3:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /nssmf-agent/*
+        V2: delete
+      nssmf-designer-1:
+        PType: p
+        V0: SODesigner
+        V1: /nssmf-agent/*
+        V2: get
+      nssmf-designer-2:
+        PType: p
+        V0: SODesigner
+        V1: /nssmf-agent/*
+        V2: create
+      nssmf-designer-3:
+        PType: p
+        V0: SODesigner
+        V1: /nssmf-agent/*
+        V2: delete
+      nssmf-readOnly-1:
+        PType: p
+        V0: SOReadOnly
+        V1: /nssmf-agent/*
+        V2: get
+
+{{- end }}

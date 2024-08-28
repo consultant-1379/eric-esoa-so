@@ -1,0 +1,59 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+{{ if .Values.certificates.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ template "eric-esoa-so.name" . }}-certificate
+  labels:
+    {{- include "eric-esoa-so.kubernetes-io-info" .| nindent 4 }}
+  annotations:
+    cert-manager.io/private-key-secret-name: {{ .Values.ingress.tls.secretName }}
+    {{- include "eric-esoa-so.helm-annotations" .| nindent 4 }}
+spec:
+  commonName: {{ template "eric-esoa-so.name" . }}-external
+  dnsNames:
+    - localhost
+    - {{ template "eric-esoa-so.fqdn" . }}
+  subject:
+    organizations:
+{{ toYaml .Values.certificates.subject.organizations | indent 6 }}
+    organizationalUnits:
+{{ toYaml .Values.certificates.subject.organizationalUnits | indent 6 }}
+  duration: {{ .Values.certificates.duration }}
+  {{- if .Values.certificates.ca.enabled }}
+  issuerRef:
+    name: {{ template "eric-esoa-so.name" . }}-issuer
+  {{- else }}
+  issuerRef:
+    name: {{ .Values.certificates.ca.issuer }}
+  {{- end }}
+  privateKey:
+    algorithm: RSA
+    rotationPolicy: Always
+    size: 2048
+  renewBefore: {{ .Values.certificates.renewBefore }}
+  secretName: {{ .Values.ingress.tls.secretName }}
+  secretTemplate:
+    labels:
+      bam-secret-monitored: "true"
+  usages:
+    - server auth
+    - client auth
+    - digital signature
+    - key encipherment
+{{- end }}

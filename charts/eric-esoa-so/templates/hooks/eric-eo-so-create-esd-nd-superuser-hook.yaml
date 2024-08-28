@@ -1,0 +1,92 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+{{- if eq (include "eric-esoa-so.create-esd-nd-superuser-hook" . ) "true"}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "eric-esoa-so.name" . }}-create-esd-nd-superuser-hook
+  labels:
+    {{- include "eric-esoa-so.kubernetes-io-info" .| nindent 4 }}
+  annotations:
+    {{- include "eric-esoa-so.helm-annotations" .| nindent 4 }}
+    "helm.sh/hook": post-install, post-upgrade
+    "helm.sh/hook-weight": "100"
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ template "eric-esoa-so.name" . }}
+    spec:
+      serviceAccountName: {{ template "eric-esoa-so.name" . }}-sa
+      {{- if  .Values.imageCredentials.pullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.imageCredentials.pullSecret | quote }}
+      {{- else if .Values.global.pullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.global.pullSecret | quote }}
+      {{- end }}
+      restartPolicy: Never
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: curl-init
+          image: {{ template "baseImage.mainImagePath" . }}
+          imagePullPolicy: {{ .Values.imageCredentials.pullPolicy | quote }}
+          command: ["sh"]
+          args: [ "-c", "while [ true ]; do if [ $(curl -k -Ss -w '%{http_code}' -o /curl-output/response.txt {{ include "eric-esoa-so.create-esd-superuser-hook.tls.args" . }} -H 'Authorization: Basic {{ include "eric-oss-cmn-topology-svc-core-adminuser-credentials" . | trim}}' -X GET {{ .Values.clients.esd.url }}/oss-core-ws/rest/oaf-adv/picklistmetadata/picklistDefinition) == '200' ]; then break; fi; echo 'Waiting for CTS to come up' ; sleep 5 ; done" ]
+          volumeMounts:
+            - name: curl-volume
+              mountPath: /curl-output
+            {{- include "eric-esoa-so-library-chart.sip-tls-volume-mounts.v1" .| indent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 254498
+            privileged: false
+            capabilities:
+              drop:
+                - all
+      containers:
+        - name: curl
+          image: {{ template "baseImage.mainImagePath" . }}
+          imagePullPolicy: {{ template "eric-esoa-so.registryImagePullPolicy" . }}
+          command: [ "sh", "-c", "if [ $(curl -k -Ss -w '%{http_code}' -o response.txt {{ include "eric-esoa-so.create-esd-superuser-hook.tls.args" . }} -H 'Authorization: Basic {{ include "eric-oss-cmn-topology-svc-core-adminuser-credentials" . | trim }}' -H 'Content-Type: application/xml' -X POST {{ .Values.clients.esd.url }}/oss-core-ws/oaf-adv/ConfigurationService --data @/config/request.xml) != '200' ];then cat response.txt 2>/dev/null; exit 1; fi;" ]
+          volumeMounts:
+            - name: {{ template "eric-esoa-so.name" . }}-create-esd-nd-superuser-configuration-volume
+              mountPath: /config
+            {{- include "eric-esoa-so-library-chart.sip-tls-volume-mounts.v1" .| indent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 112617
+            privileged: false
+            capabilities:
+              drop:
+                - all
+      {{- include "eric-esoa-so.nodeSelector" .| indent 6 }}
+      volumes:
+        - name: curl-volume
+          emptyDir: {}
+        - name: {{ template "eric-esoa-so.name" . }}-create-esd-nd-superuser-configuration-volume
+          configMap:
+            name: {{ template "eric-esoa-so.name" . }}-create-esd-nd-superuser-configmap
+            defaultMode: 0777
+        {{- include "eric-esoa-so-library-chart.sip-tls-volumes.v1" .| indent 8 }}
+{{- end }}

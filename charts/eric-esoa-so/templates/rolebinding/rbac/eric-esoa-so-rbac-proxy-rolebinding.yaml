@@ -1,0 +1,46 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ template "eric-esoa-so.name" . }}-rbac-proxy
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ template "eric-esoa-so.name" . }}-rbac-proxy
+subjects:
+  - kind: ServiceAccount
+    name: eric-esoa-so-nssmf-agent-rbac-proxy
+    namespace: {{ .Release.Namespace }}
+  - kind: ServiceAccount
+    name: eric-esoa-so-dashboard-rbac-proxy
+    namespace: {{ .Release.Namespace }}
+  - kind: ServiceAccount
+    name: eric-esoa-so-orch-gui-rbac-proxy
+    namespace: {{ .Release.Namespace }}
+  - kind: ServiceAccount
+    name: eric-esoa-catalog-manager-rbac-proxy
+    namespace: {{ .Release.Namespace }}
+  - kind: ServiceAccount
+    name: eric-esoa-so-orchestrationcockpit-rbac-proxy
+    namespace: {{ .Release.Namespace }}
+  - kind: ServiceAccount
+    name: eric-esoa-key-management-agent-rbac-proxy
+    namespace: {{ .Release.Namespace }}
+  - kind: ServiceAccount
+    name: eric-esoa-so-domain-orch-adapter-rbac-proxy
+    namespace: {{ .Release.Namespace }}

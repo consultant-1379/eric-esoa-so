@@ -1,0 +1,45 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+{{ if .Values.global.networkPolicy.enabled -}}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: {{ template "eric-esoa-so.name" . }}-playbook-service-limit-internal-traffic
+  labels:
+    chart: {{ template "eric-esoa-so.chart" . }}
+  {{- include "eric-esoa-so.kubernetes-io-info" .| nindent 4 }}
+  annotations:
+  {{- include "eric-esoa-so.helm-annotations" .| nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: eric-eo-playbook-service
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: celery
+    - podSelector:
+        matchLabels:
+          app: eric-pm-server
+    - podSelector:
+        matchLabels:
+          app: eric-oss-tosca-orchestration-enabler
+    - podSelector:
+        matchLabels:
+          app: eric-eo-playbook-service-update-playbook-execution-status-hook
+{{- end }}

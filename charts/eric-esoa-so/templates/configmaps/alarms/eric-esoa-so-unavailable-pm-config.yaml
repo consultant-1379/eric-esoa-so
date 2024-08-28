@@ -1,0 +1,457 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+
+{{- if .Values.alarms.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "eric-esoa-so.name" . }}-unavailable-pm-config
+  labels:
+    bss.ericsson.com/bamPMconfigAggregator: "true"
+    {{- include "eric-esoa-so.kubernetes-io-info" .| nindent 4 }}
+  annotations:
+    {{- include "eric-esoa-so.helm-annotations" .| nindent 4 }}
+data:
+  pmThreshold.json: |-
+    {
+      "data": {
+        "ericsson-pm:pm": {
+          "job": [
+            {
+              "granularity-period": "one-min",
+              "name": "eric-esoa-catalog-manager-unavailable-job",
+              "requested-job-state": "active",
+              "type": "threshold-job",
+              "measurement-reader": [
+                {
+                  "group-ref": "eric-esoa-so-alarm-group",
+                  "measurement-type-ref": "eric-esoa-catalog-manager-unavailable",
+                  "name": "eric-esoa-catalog-manager-unavailable-reader",
+                  "threshold-monitoring": [
+                    {
+                      "name": "eric-esoa-catalog-manager-unavailable-critical",
+                      "threshold-high": "1",
+                      "threshold-low": "0",
+                      "threshold-severity": "critical"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "granularity-period": "one-min",
+              "name": "eric-esoa-dashboard-unavailable-job",
+              "requested-job-state": "active",
+              "type": "threshold-job",
+              "measurement-reader": [
+                {
+                  "group-ref": "eric-esoa-so-alarm-group",
+                  "measurement-type-ref": "eric-esoa-dashboard-unavailable",
+                  "name": "eric-esoa-dashboard-unavailable-reader",
+                  "threshold-monitoring": [
+                    {
+                      "name": "eric-esoa-dashboard-unavailable-critical",
+                      "threshold-high": "1",
+                      "threshold-low": "0",
+                      "threshold-severity": "critical"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "granularity-period": "one-min",
+              "name": "eric-esoa-orchestration-gui-unavailable-job",
+              "requested-job-state": "active",
+              "type": "threshold-job",
+              "measurement-reader": [
+                {
+                  "group-ref": "eric-esoa-so-alarm-group",
+                  "measurement-type-ref": "eric-esoa-orchestration-gui-unavailable",
+                  "name": "eric-esoa-orchestration-gui-unavailable-reader",
+                  "threshold-monitoring": [
+                    {
+                      "name": "eric-esoa-orchestration-gui-unavailable-critical",
+                      "threshold-high": "1",
+                      "threshold-low": "0",
+                      "threshold-severity": "critical"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "granularity-period": "one-min",
+              "name": "eric-esoa-orchestration-cockpit-unavailable-job",
+              "requested-job-state": "active",
+              "type": "threshold-job",
+              "measurement-reader": [
+                {
+                  "group-ref": "eric-esoa-so-alarm-group",
+                  "measurement-type-ref": "eric-esoa-orchestration-cockpit-unavailable",
+                  "name": "eric-esoa-orchestration-cockpit-unavailable-reader",
+                  "threshold-monitoring": [
+                    {
+                      "name": "eric-esoa-orchestration-cockpit-unavailable-critical",
+                      "threshold-high": "1",
+                      "threshold-low": "0",
+                      "threshold-severity": "critical"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "granularity-period": "one-min",
+              "name": "eric-esoa-playbook-service-unavailable-job",
+              "requested-job-state": "active",
+              "type": "threshold-job",
+              "measurement-reader": [
+                {
+                  "group-ref": "eric-esoa-so-alarm-group",
+                  "measurement-type-ref": "eric-esoa-playbook-service-unavailable",
+                  "name": "eric-esoa-playbook-service-unavailable-reader",
+                  "threshold-monitoring": [
+                    {
+                      "name": "eric-esoa-playbook-service-unavailable-critical",
+                      "threshold-high": "1",
+                      "threshold-low": "0",
+                      "threshold-severity": "critical"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "granularity-period": "one-min",
+              "name": "eric-esoa-nssmf-agent-unavailable-job",
+              "requested-job-state": "active",
+              "type": "threshold-job",
+              "measurement-reader": [
+                {
+                  "group-ref": "eric-esoa-so-alarm-group",
+                  "measurement-type-ref": "eric-esoa-nssmf-agent-unavailable",
+                  "name": "eric-esoa-nssmf-agent-unavailable-reader",
+                  "threshold-monitoring": [
+                    {
+                      "name": "eric-esoa-nssmf-agent-unavailable-critical",
+                      "threshold-high": "1",
+                      "threshold-low": "0",
+                      "threshold-severity": "critical"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "granularity-period": "one-min",
+              "name": "eric-esoa-toscao-unavailable-job",
+              "requested-job-state": "active",
+              "type": "threshold-job",
+              "measurement-reader": [
+                {
+                  "group-ref": "eric-esoa-so-alarm-group",
+                  "measurement-type-ref": "eric-esoa-toscao-unavailable",
+                  "name": "eric-esoa-toscao-unavailable-reader",
+                  "threshold-monitoring": [
+                    {
+                      "name": "eric-esoa-toscao-unavailable-critical",
+                      "threshold-high": "1",
+                      "threshold-low": "0",
+                      "threshold-severity": "critical"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "granularity-period": "one-min",
+              "name": "eric-esoa-domain-orch-adapter-unavailable-job",
+              "requested-job-state": "active",
+              "type": "threshold-job",
+              "measurement-reader": [
+                {
+                  "group-ref": "eric-esoa-so-alarm-group",
+                  "measurement-type-ref": "eric-esoa-domain-orch-adapter-unavailable",
+                  "name": "eric-esoa-domain-orch-adapter-unavailable-reader",
+                  "threshold-monitoring": [
+                    {
+                      "name": "eric-esoa-domain-orch-adapter-unavailable-critical",
+                      "threshold-high": "1",
+                      "threshold-low": "0",
+                      "threshold-severity": "critical"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "granularity-period": "one-min",
+              "name": "eric-esoa-tosca-orchestration-enabler-unavailable-job",
+              "requested-job-state": "active",
+              "type": "threshold-job",
+              "measurement-reader": [
+                {
+                  "group-ref": "eric-esoa-so-alarm-group",
+                  "measurement-type-ref": "eric-esoa-tosca-orchestration-enabler-unavailable",
+                  "name": "eric-esoa-tosca-orchestration-enabler-unavailable-reader",
+                  "threshold-monitoring": [
+                    {
+                      "name": "eric-esoa-tosca-orchestration-enabler-unavailable-critical",
+                      "threshold-high": "1",
+                      "threshold-low": "0",
+                      "threshold-severity": "critical"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "granularity-period": "one-min",
+              "name": "eric-esoa-key-management-agent-unavailable-job",
+              "requested-job-state": "active",
+              "type": "threshold-job",
+              "measurement-reader": [
+                {
+                  "group-ref": "eric-esoa-so-alarm-group",
+                  "measurement-type-ref": "eric-esoa-key-management-agent-unavailable",
+                  "name": "eric-esoa-key-management-agent-unavailable-reader",
+                  "threshold-monitoring": [
+                    {
+                      "name": "eric-esoa-key-management-agent-unavailable-critical",
+                      "threshold-high": "1",
+                      "threshold-low": "0",
+                      "threshold-severity": "critical"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "group": [
+            {
+              "version": "0.0.1",
+              "name": "eric-esoa-so-alarm-group",
+              "measurement-type": [
+                {
+                  "id": "eric-esoa-catalog-manager-unavailable",
+                  "aggregation": "sum",
+                  "collection-method": "gauge",
+                  "condition": "Raised: when an application instance goes down. Cleared: when an instance comes back up.",
+                  "description": "Raise alarm when an application goes down, and clear it once it's back up.",
+                  "measurement-status": "used",
+                  "multiplicity": 1,
+                  "reset-at-gran-period": false,
+                  "size": 8,
+                  "internal-metric-name": "kube_deployment_status_replicas_available",
+                  "internal-instrumentation-label": {
+                    "deployment": "eric-eo-catalog-manager"
+                  },
+                  "internal-target-pattern": "deployment=[deployment]",
+                  "threshold-direction": "decreasing",
+                  "fm-alarm-type": "ProcessingErrorAlarm",
+                  "fault-name": "catalogManagerUnavailable",
+                  "service-name": "eric-eo-catalog-manager"
+                },
+                {
+                  "id": "eric-esoa-dashboard-unavailable",
+                  "aggregation": "sum",
+                  "collection-method": "gauge",
+                  "condition": "Raised: when an application instance goes down. Cleared: when an instance comes back up.",
+                  "description": "Raise alarm when an application goes down, and clear it once it's back up.",
+                  "measurement-status": "used",
+                  "multiplicity": 1,
+                  "reset-at-gran-period": false,
+                  "size": 8,
+                  "internal-metric-name": "kube_deployment_status_replicas_available",
+                  "internal-instrumentation-label": {
+                    "deployment": "eric-eo-dashboard"
+                  },
+                  "internal-target-pattern": "deployment=[deployment]",
+                  "threshold-direction": "decreasing",
+                  "fm-alarm-type": "ProcessingErrorAlarm",
+                  "fault-name": "dashboardUnavailable",
+                  "service-name": "eric-eo-dashboard"
+                },
+                {
+                  "id": "eric-esoa-orchestration-gui-unavailable",
+                  "aggregation": "sum",
+                  "collection-method": "gauge",
+                  "condition": "Raised: when an application instance goes down. Cleared: when an instance comes back up.",
+                  "description": "Raise alarm when an application goes down, and clear it once it's back up.",
+                  "measurement-status": "used",
+                  "multiplicity": 1,
+                  "reset-at-gran-period": false,
+                  "size": 8,
+                  "internal-metric-name": "kube_deployment_status_replicas_available",
+                  "internal-instrumentation-label": {
+                    "deployment": "eric-eo-orchestration-gui"
+                  },
+                  "internal-target-pattern": "deployment=[deployment]",
+                  "threshold-direction": "decreasing",
+                  "fm-alarm-type": "ProcessingErrorAlarm",
+                  "fault-name": "orchestrationGuiUnavailable",
+                  "service-name": "eric-eo-orchestration-gui"
+                },
+                {
+                  "id": "eric-esoa-orchestration-cockpit-unavailable",
+                  "aggregation": "sum",
+                  "collection-method": "gauge",
+                  "condition": "Raised: when an application instance goes down. Cleared: when an instance comes back up.",
+                  "description": "Raise alarm when an application goes down, and clear it once it's back up.",
+                  "measurement-status": "used",
+                  "multiplicity": 1,
+                  "reset-at-gran-period": false,
+                  "size": 8,
+                  "internal-metric-name": "kube_deployment_status_replicas_available",
+                  "internal-instrumentation-label": {
+                    "deployment": "eric-eo-orchestrationcockpit"
+                  },
+                  "internal-target-pattern": "deployment=[deployment]",
+                  "threshold-direction": "decreasing",
+                  "fm-alarm-type": "ProcessingErrorAlarm",
+                  "fault-name": "orchestrationCockpitUnavailable",
+                  "service-name": "eric-eo-orchestrationcockpit"
+                },
+                {
+                  "id": "eric-esoa-playbook-service-unavailable",
+                  "aggregation": "sum",
+                  "collection-method": "gauge",
+                  "condition": "Raised: when an application instance goes down. Cleared: when an instance comes back up.",
+                  "description": "Raise alarm when an application goes down, and clear it once it's back up.",
+                  "measurement-status": "used",
+                  "multiplicity": 1,
+                  "reset-at-gran-period": false,
+                  "size": 8,
+                  "internal-metric-name": "kube_deployment_status_replicas_available",
+                  "internal-instrumentation-label": {
+                    "deployment": "eric-eo-playbook-service"
+                  },
+                  "internal-target-pattern": "deployment=[deployment]",
+                  "threshold-direction": "decreasing",
+                  "fm-alarm-type": "ProcessingErrorAlarm",
+                  "fault-name": "playBookServiceUnavailable",
+                  "service-name": "eric-eo-playbook-service"
+                },
+                {
+                  "id": "eric-esoa-nssmf-agent-unavailable",
+                  "aggregation": "sum",
+                  "collection-method": "gauge",
+                  "condition": "Raised: when an application instance goes down. Cleared: when an instance comes back up.",
+                  "description": "Raise alarm when an application goes down, and clear it once it's back up.",
+                  "measurement-status": "used",
+                  "multiplicity": 1,
+                  "reset-at-gran-period": false,
+                  "size": 8,
+                  "internal-metric-name": "kube_deployment_status_replicas_available",
+                  "internal-instrumentation-label": {
+                    "deployment": "eric-eo-so-nssmf-agent"
+                  },
+                  "internal-target-pattern": "deployment=[deployment]",
+                  "threshold-direction": "decreasing",
+                  "fm-alarm-type": "ProcessingErrorAlarm",
+                  "fault-name": "nssmfAgentUnavailable",
+                  "service-name": "eric-eo-so-nssmf-agent"
+                },
+                {
+                  "id": "eric-esoa-toscao-unavailable",
+                  "aggregation": "sum",
+                  "collection-method": "gauge",
+                  "condition": "Raised: when an application instance goes down. Cleared: when an instance comes back up.",
+                  "description": "Raise alarm when an application goes down, and clear it once it's back up.",
+                  "measurement-status": "used",
+                  "multiplicity": 1,
+                  "reset-at-gran-period": false,
+                  "size": 8,
+                  "internal-metric-name": "kube_deployment_status_replicas_available",
+                  "internal-instrumentation-label": {
+                    "deployment": "toscao"
+                  },
+                  "internal-target-pattern": "deployment=[deployment]",
+                  "threshold-direction": "decreasing",
+                  "fm-alarm-type": "ProcessingErrorAlarm",
+                  "fault-name": "toscaoUnavailable",
+                  "service-name": "toscao"
+                },
+                {
+                  "id": "eric-esoa-domain-orch-adapter-unavailable",
+                  "aggregation": "sum",
+                  "collection-method": "gauge",
+                  "condition": "Raised: when an application instance goes down. Cleared: when an instance comes back up.",
+                  "description": "Raise alarm when an application goes down, and clear it once it's back up.",
+                  "measurement-status": "used",
+                  "multiplicity": 1,
+                  "reset-at-gran-period": false,
+                  "size": 8,
+                  "internal-metric-name": "kube_deployment_status_replicas_available",
+                  "internal-instrumentation-label": {
+                    "deployment": "eric-oss-domain-orch-adapter"
+                  },
+                  "internal-target-pattern": "deployment=[deployment]",
+                  "threshold-direction": "decreasing",
+                  "fm-alarm-type": "ProcessingErrorAlarm",
+                  "fault-name": "domainOrchestrationAdapterUnavailable",
+                  "service-name": "eric-oss-domain-orch-adapter"
+                },
+                {
+                  "id": "eric-esoa-tosca-orchestration-enabler-unavailable",
+                  "aggregation": "sum",
+                  "collection-method": "gauge",
+                  "condition": "Raised: when an application instance goes down. Cleared: when an instance comes back up.",
+                  "description": "Raise alarm when an application goes down, and clear it once it's back up.",
+                  "measurement-status": "used",
+                  "multiplicity": 1,
+                  "reset-at-gran-period": false,
+                  "size": 8,
+                  "internal-metric-name": "kube_deployment_status_replicas_available",
+                  "internal-instrumentation-label": {
+                    "deployment": "eric-oss-tosca-orchestration-enabler"
+                  },
+                  "internal-target-pattern": "deployment=[deployment]",
+                  "threshold-direction": "decreasing",
+                  "fm-alarm-type": "ProcessingErrorAlarm",
+                  "fault-name": "toscaOrchestrationEnablerUnavailable",
+                  "service-name": "eric-oss-tosca-orchestration-enabler"
+                },
+                {
+                  "id": "eric-esoa-key-management-agent-unavailable",
+                  "aggregation": "sum",
+                  "collection-method": "gauge",
+                  "condition": "Raised: when an application instance goes down. Cleared: when an instance comes back up.",
+                  "description": "Raise alarm when an application goes down, and clear it once it's back up.",
+                  "measurement-status": "used",
+                  "multiplicity": 1,
+                  "reset-at-gran-period": false,
+                  "size": 8,
+                  "internal-metric-name": "kube_deployment_status_replicas_available",
+                  "internal-instrumentation-label": {
+                    "deployment": "eric-esoa-key-management-agent"
+                  },
+                  "internal-target-pattern": "deployment=[deployment]",
+                  "threshold-direction": "decreasing",
+                  "fm-alarm-type": "ProcessingErrorAlarm",
+                  "fault-name": "keyManagementAgentUnavailable",
+                  "service-name": "eric-esoa-key-management-agent"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+
+{{- end }}

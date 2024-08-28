@@ -1,0 +1,48 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+{{ if .Values.certificates.enabled }}
+{{ if .Values.certificates.ca.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ template "eric-esoa-so.name" . }}-ca-certificate
+  labels:
+    {{- include "eric-esoa-so.kubernetes-io-info" .| nindent 4 }}
+  annotations:
+    {{- include "eric-esoa-so.helm-annotations" .| nindent 4 }}
+spec:
+  isCA: true
+  privateKey:
+    rotationPolicy: Always
+    algorithm: RSA
+    size: 2048
+  secretName: {{ template "eric-esoa-so.name" . }}-ca-cert
+  commonName: {{ template "eric-esoa-so.name" . }}-ca
+  subject:
+    organizations:
+{{ toYaml .Values.certificates.subject.organizations | indent 6 }}
+    organizationalUnits:
+{{ toYaml .Values.certificates.subject.organizationalUnits | indent 6 }}
+  usages:
+    - "cert sign"
+    - "crl sign"
+  duration: {{ .Values.certificates.ca.duration }}
+  renewBefore: {{ .Values.certificates.ca.renewBefore }}
+  issuerRef:
+    name: {{ template "eric-esoa-so.name" . }}-root-issuer
+{{- end }}
+{{- end }}

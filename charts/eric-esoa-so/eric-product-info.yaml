@@ -1,0 +1,34 @@
+productName: SO Integration Chart
+productNumber: TBC
+images:
+  iamClient:
+    productName: Identity Access Management Client
+    productNumber: CXA 301 140
+    registry: armdocker.rnd.ericsson.se
+    repoPath: proj-esoa-so
+    name: eric-esoa-iam-client
+    tag: 1.0.0-52
+  soBaseImage:
+    productName: so-base-image
+    productNumber: ''
+    registry: armdocker.rnd.ericsson.se
+    repoPath: proj-esoa-so
+    name: so-base
+    tag: 1.3.2-1
+  bpmnWorkflowUpload:
+    productName: SO BPMN Workflow Upload Image
+    productNumber: ''
+    registry: armdocker.rnd.ericsson.se
+    repoPath: proj-esoa-so
+    name: eso-common-workflow-bpmn
+    tag: 1.5.6-1
+  so-common-workflows-delegates:
+    productName: SO Camunda Delegates Image
+    productNumber: ''
+    registry: armdocker.rnd.ericsson.se
+    repoPath: proj-esoa-so
+    name: so-common-workflows-delegates
+    tag: 1.5.6-1
+relatedArtifacts:
+  eric-bos-dr-tosca-sid:
+    version: 2.6.2-1

@@ -1,0 +1,92 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+
+{{- if index .Values "eric-eo-dashboard" "enabled" }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ template "eric-esoa-so.name" . }}-dashboard-rbac-configmap
+  labels:
+    app: {{ template "eric-esoa-so.name" . }}
+    {{- include "eric-esoa-so.kubernetes-io-info" .| nindent 4 }}
+    com.ericsson.bss/bam-global-rbac: {{ .Values.rbac.label }}
+  annotations:
+    {{- include "eric-esoa-so.helm-annotations" .| nindent 4 }}
+data:
+  rbac: |
+    policy:
+      dashboard-user-role-1:
+        PType: p
+        V0: SOUser
+        V1: /dashboard/v1/instances/*
+        V2: get
+      dashboard-user-role-2:
+        PType: p
+        V0: SOUser
+        V1: /dashboard/v1/templates/*
+        V2: get
+      dashboard-user-role-3:
+        PType: p
+        V0: SOUser
+        V1: /dashboard/v1/service-orders/*
+        V2: get
+      dashboard-admin-role-1:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /dashboard/v1/instances/*
+        V2: get
+      dashboard-admin-role-2:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /dashboard/v1/templates/*
+        V2: get
+      dashboard-admin-role-3:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /dashboard/v1/service-orders/*
+        V2: get
+      dashboard-designer-role-1:
+        PType: p
+        V0: SODesigner
+        V1: /dashboard/v1/instances/*
+        V2: get
+      dashboard-designer-role-2:
+        PType: p
+        V0: SODesigner
+        V1: /dashboard/v1/templates/*
+        V2: get
+      dashboard-designer-role-3:
+        PType: p
+        V0: SODesigner
+        V1: /dashboard/v1/service-orders/*
+        V2: get
+      dashboard-readOnly-role-1:
+        PType: p
+        V0: SOReadOnly
+        V1: /dashboard/v1/instances/*
+        V2: get
+      dashboard-readOnly-role-2:
+        PType: p
+        V0: SOReadOnly
+        V1: /dashboard/v1/templates/*
+        V2: get
+      dashboard-readOnly-role-3:
+        PType: p
+        V0: SOReadOnly
+        V1: /dashboard/v1/service-orders/*
+        V2: get
+{{- end }}

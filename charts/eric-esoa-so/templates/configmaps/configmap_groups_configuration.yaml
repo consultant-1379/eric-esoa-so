@@ -1,0 +1,41 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ template "eric-esoa-so.name" . }}-groups-configuration-configmap
+  labels:
+    app: {{ template "eric-esoa-so.name" . }}
+  {{- include "eric-esoa-so.kubernetes-io-info" .| nindent 4 }}
+  annotations:
+  {{- include "eric-esoa-so.helm-annotations" .| nindent 4 }}
+data:
+  groups-configuration.json: |
+        [
+          {
+            "name": "SOProviderAdmin"
+          },
+          {
+            "name": "SODesigner"
+          },
+          {
+            "name": "SOUser"
+          },
+          {
+            "name": "SOReadOnly"
+          }
+        ]

@@ -1,0 +1,105 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+
+{{- if index .Values "workflows" "enabled" }}
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "eric-esoa-so.name" . }}-upload-so-bpmn-hook
+  labels:
+    {{- include "eric-esoa-so.kubernetes-io-info" .| nindent 4 }}
+  annotations:
+    {{- include "eric-esoa-so.helm-annotations" .| nindent 4 }}
+    "helm.sh/hook": post-install, post-upgrade, post-rollback
+    "helm.sh/hook-weight": "30"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 8
+  template:
+    metadata:
+      labels:
+        app: {{ template "eric-esoa-so.name" . }}
+    spec:
+      {{- if  .Values.imageCredentials.pullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.imageCredentials.pullSecret | quote }}
+      {{- else if .Values.global.pullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.global.pullSecret | quote }}
+      {{- end }}
+      restartPolicy: Never
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: bpmn-workflow-upload
+          image: {{ template "eric-esoa-so-library-chart.imagePath" (dict "imageId" "bpmnWorkflowUpload" "values" .Values "files" .Files) }}
+          imagePullPolicy: {{ template "eric-esoa-so.bpmnWorkflowUpload.registryImagePullPolicy" . }}
+          env:
+            - name: "auth_host"
+              value: {{ template "eric-esoa-eoc.fqdn" .}}
+            - name: "auth_port"
+              value: "{{ .Values.eoc.eocAdmin.port }}"
+            - name: "username"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.eoc.pc.secret.name }}"
+                  key: "{{ .Values.eoc.pc.secret.userKey }}"
+            - name: "password"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.eoc.pc.secret.name }}"
+                  key: "{{ .Values.eoc.pc.secret.passwordKey }}"
+            - name: "pc_host"
+              value: {{ template "eric-esoa-eoc.fqdn" .}}
+            - name: "pc_port"
+              value: "{{ .Values.eoc.eocAdmin.port }}"
+            - name: 'TLS_MNT_CERT_PATH'
+              value: "/mnt/certs"
+            - name: 'TLS_CERT_PATH'
+              value: "/certs"
+            - name: "tls.enabled"
+              value: "{{ .Values.eoc.tls.enabled }}"
+            - name: "max_retries"
+              value: "{{ .Values.workflows.retries }}"
+          volumeMounts:
+          - name: create-cacert-volume
+            mountPath: "/mnt/certs"
+          - name: cert-volume
+            mountPath: "/certs"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 146672
+            privileged: false
+            capabilities:
+              drop:
+                - all
+      {{- include "eric-esoa-so.nodeSelector" .| indent 6 }}
+      volumes:
+      - name: cert-volume
+        emptyDir: {}
+      - name: create-cacert-volume
+        secret:
+          secretName: {{ .Values.workflows.eocTLS.secretName }}
+          items:
+            - key: {{ .Values.workflows.eocTLS.key }}
+              path: {{ .Values.workflows.eocTLS.filePath }}
+
+{{- end }}

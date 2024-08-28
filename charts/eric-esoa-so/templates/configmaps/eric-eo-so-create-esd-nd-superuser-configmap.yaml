@@ -1,0 +1,49 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "eric-esoa-so.name" . }}-create-esd-nd-superuser-configmap
+  labels:
+  {{- include "eric-esoa-so.kubernetes-io-info" .| nindent 4 }}
+  annotations:
+  {{- include "eric-esoa-so.helm-annotations" .| nindent 4 }}
+data:
+    request.xml: |
+        <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+            <soap:Body>
+                <ns6:create xmlns:ns6="urn:com:ericsson:schema:wsdl:oss:core:admin:ws:ConfigurationService:command"
+                            xmlns:ns5="urn:com:ericsson:schema:xml:oss:core:admin:data-types:1:0">
+                    <property>
+                        <binding xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns5:configurationPropertyToApplication">
+                            <targetObjects>
+                                <element>
+                                    <mode>ADDED</mode>
+                                    <value xsi:type="ns5:application">
+                                        <key xsi:type="ns5:applicationKey">
+                                            <keyValue>101</keyValue>
+                                        </key>
+                                    </value>
+                                </element>
+                            </targetObjects>
+                        </binding>
+                        <name>osscore.nd.provisioningSuperUser.name</name>
+                        <value>{{ include "get-ctsSecret-username" . | trim }}</value>
+                    </property>
+                </ns6:create>
+            </soap:Body>
+        </soap:Envelope>

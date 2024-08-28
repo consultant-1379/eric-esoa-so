@@ -1,0 +1,91 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+{{ if .Values.global.networkPolicy.enabled -}}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: {{ template "eric-esoa-so.name" . }}-catalog-manager-limit-internal-traffic
+  labels:
+    chart: {{ template "eric-esoa-so.chart" . }}
+  {{- include "eric-esoa-so.kubernetes-io-info" .| nindent 4 }}
+  annotations:
+  {{- include "eric-esoa-so.helm-annotations" .| nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: eric-eo-catalog-manager
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: eric-eo-onboarding
+    - podSelector:
+        matchLabels:
+          app: eric-esoa-api-gateway
+    - podSelector:
+        matchLabels:
+          app: toscao
+    - podSelector:
+        matchLabels:
+          app: eric-pm-server
+    - podSelector:
+         matchLabels:
+           app: eric-eo-playbook-service
+    - podSelector:
+        matchLabels:
+          app: eric-eo-orchestrationcockpit
+    - podSelector:
+        matchLabels:
+          app: eric-eo-so-nssmf-agent
+    - podSelector:
+        matchLabels:
+          app: eric-oss-cmn-topology-svc-core
+    - podSelector:
+        matchLabels:
+          app: eric-oss-tosca-orchestration-enabler
+    - podSelector:
+        matchLabels:
+          app: eric-oss-so-assets
+    - podSelector:
+        matchLabels:
+          app: eric-esoa-subsystem-management
+    - podSelector:
+        matchLabels:
+          app: eric-esoa-catalog-manager-rbac-proxy
+    ports:
+      - port: 80
+        protocol: TCP
+      - port: 8080
+        protocol: TCP
+  {{- if eq (include "eric-esoa-so.global-security-tls-enabled" .) "true" }}
+      - port: 443
+        protocol: TCP
+      - port: 8443
+        protocol: TCP
+  {{- end }}
+      - port: 15020
+        protocol: TCP
+      - port: 15090
+        protocol: TCP
+  {{- if .Values.global.developmentEnabled }}
+  - ports:
+    - port: 8080
+   {{- if eq (include "eric-esoa-so.global-security-tls-enabled" .) "true" }}
+    - port: 8443
+   {{- end }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,183 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "eric-esoa-so.name" . }}-toscao-hook
+  labels:
+  {{- include "eric-esoa-so.kubernetes-io-info" .| nindent 4 }}
+  annotations:
+  {{- include "eric-esoa-so.helm-annotations" .| nindent 4 }}
+data:
+  csarhook.py: |
+    from __future__ import print_function
+    import os
+    from ruamel.yaml import YAML
+
+    SDC_META_FILE = "csar.meta"
+    META_FILE = 'TOSCA-Metadata/TOSCA.meta'
+    DEFINITION = 'Definitions'
+    yaml = YAML()
+    normative_imports = ['nodes', 'data', 'capabilities', 'relationships', 'groups', \
+                        'policies', 'interfaces', 'artifacts']
+    data_types_list = ['tosca.datatypes.Root', 'integer', 'string', 'boolean',\
+                      'float', 'list', 'map', 'scalar-unit', 'scalar-unit.size', \
+                      'scalar-unit.time', 'scalar-unit.frequency']
+
+    class  Csarh(object):
+        def __init__(self, extracted_dir, meta_file_path, def_path, entry_path, rm_topology):
+            self.extracted_dir = extracted_dir
+            self.meta_file_path = meta_file_path
+            self.def_path = def_path
+            self.entry_path = entry_path
+            self.rm_topology = rm_topology
+
+        def process_csar(self):
+            for lfile in os.listdir(self.def_path):
+                filename, extension = os.path.splitext(lfile)
+                if extension == '.yml' or extension == '.yaml':
+                    if filename == 'data':
+                        self.remove_data_types(os.path.join(self.def_path, lfile))
+                    if filename not in normative_imports:
+                        fullname = os.path.join(self.def_path, lfile)
+                        self.topology_import_handler(fullname, lfile)
+            self.remove_topology()
+            self.rename_proxy_nodes()
+
+        def remove_topology(self):
+            if self.rm_topology:
+                for item in self.rm_topology:
+                    os.remove(os.path.join(self.def_path, item))
+
+        def remove_data_types(self, filename): #pylint: disable=no-self-use
+            input_file = open(filename).read()
+            yml_obj = yaml.load(input_file)
+            if "data_types" in yml_obj:
+                for item in data_types_list:
+                    yml_obj["data_types"].pop(item, None)
+            output_file = open(filename, "w")
+            yaml.dump(yml_obj, output_file)
+            output_file.close()
+
+        def get_entrypoint(self):
+            entry_file = open(self.entry_path).read()
+            yml_obj = yaml.load(entry_file)
+            if 'Entry-Definitions' in yml_obj:
+                entry_def = yml_obj['Entry-Definitions']
+            return entry_def
+
+        def import_handler(self, yml_obj, main_template):
+            topology_list = []
+            if self.rm_topology:
+                for item in yml_obj['imports']:
+                    for file_name in item.values():
+                        if file_name not in self.rm_topology:
+                            topology_list.append(item)
+                yml_obj['imports'] = topology_list
+                output_file = open(main_template, 'w')
+                yaml.dump(yml_obj, output_file)
+                output_file.close()
+
+        def rename_proxy_nodes(self):
+            try:
+                entry_def_file = self.get_entrypoint()
+                main_template = os.path.join(self.extracted_dir, entry_def_file)
+                input_file = open(main_template).read()
+                yml_obj = yaml.load(input_file)
+                service_node_types = []
+                self.import_handler(yml_obj, main_template)
+                if 'node_types' in yml_obj:
+                    node_type_obj = yml_obj['node_types']
+                    for item in node_type_obj:
+                        if node_type_obj[item]['derived_from'] == "org.openecomp.nodes.ServiceProxy":
+                            service_node_types.append(item)
+                if service_node_types:
+                    rename_dict = {}
+                    for ntype in service_node_types:
+                        newname = self.rename_helper(ntype)
+                        if newname:
+                            rename_dict.update({ntype:newname})
+                    node_type_list = [item for item in node_type_obj]
+                    for item in node_type_list:
+                        if item in rename_dict:
+                            node_type_obj[rename_dict[item]] = node_type_obj.pop(item)
+
+                    node_template_obj = yml_obj.get('topology_template', {}).get('node_templates', {})
+                    if node_template_obj and rename_dict:
+                        for orig, update in rename_dict.items():
+                            for item in node_template_obj:
+                                if node_template_obj[item]['type'] == orig:
+                                    node_template_obj[item]['type'] = update
+
+                    output_file = open(main_template, 'w')
+                    yaml.dump(yml_obj, output_file)
+                    output_file.close()
+
+            except Exception as e:
+                raise e
+
+        def rename_helper(self, name):   #pylint: disable=no-self-use
+            if name and name.startswith('org.openecomp.nodes'):
+                namestr = name.replace('nodes', 'service').split("_proxy")[0]
+                tmplist = namestr.split(".")
+                if tmplist:
+                    tmplist[-1] = tmplist[-1].capitalize()
+                    return ".".join(tmplist)
+
+        def check_sdc_csar(self):
+            if SDC_META_FILE in os.listdir(self.extracted_dir):
+                if 'SDC-TOSCA-Meta-File-Version' in open(self.meta_file_path).read():
+                    return True
+            return False
+
+        def topology_import_handler(self, yml_file, lfile):
+            modlist = []
+            input_file = open(yml_file).read()
+            yml_obj = yaml.load(input_file)
+            entry_def_file = self.get_entrypoint()
+            main_template = os.path.join(self.extracted_dir, entry_def_file)
+
+            if yml_file != main_template:
+                if 'topology_template' in yml_obj:
+                    self.rm_topology.append(lfile)
+                    return
+
+            if 'imports' in yml_obj:
+                for item in yml_obj['imports']:
+                    for v in item.values():
+                        modlist.append(v)
+
+            if modlist:
+                yml_obj['imports'] = modlist
+
+            output_file = open(yml_file, "w")
+            yaml.dump(yml_obj, output_file)
+            output_file.close()
+
+    ## MAIN FUNCTION ##
+    # if __name__ == '__main__':
+    #     if len(sys.argv) >= 2:
+    #         extracted_dir = sys.argv[1]
+    #         meta_file_path = os.path.join(extracted_dir, SDC_META_FILE)
+    #         def_path = os.path.join(extracted_dir, DEFINITION)
+    #         entry_path = os.path.join(extracted_dir, META_FILE)
+    #         is_sdc_csar = check_sdc_csar()
+    #         if is_sdc_csar:
+    #             print("It is a SDC based csar. Processing the csar")
+    #             process_csar()
+    #         else:
+    #             print("Not a sdc based csar. Skipping the hook script implementation")

@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "global": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "hosts": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "iam": {
+              "type": "string",
+              "format": "hostname"
+            }
+          },
+          "required": [
+            "iam"
+          ]
+        }
+      },
+      "required": [
+        "hosts"
+      ]
+    }
+  },
+  "required": [
+    "global"
+  ]
+}

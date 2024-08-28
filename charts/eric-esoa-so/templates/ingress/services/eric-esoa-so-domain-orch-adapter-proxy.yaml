@@ -1,0 +1,51 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+
+
+{{- if index .Values "eric-oss-domain-orch-adapter" "enabled" }}
+{{ if .Values.ingress.iccr.enabled }}
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  labels:
+  {{- include "eric-esoa-so.kubernetes-io-info" .| nindent 4 }}
+  annotations:
+  {{- include "eric-esoa-so.helm-annotations" .| nindent 4 }}
+    kubernetes.io/ingress.class: {{ template "eric-esoa-so.ingressClass" . }}
+  name: {{ template "eric-esoa-so.name" . }}-domain-orch-adapter-httpproxy
+spec:
+  routes:
+  - conditions:
+    - prefix: /v1/notifications
+    services:
+    - name: eric-esoa-so-domain-orch-adapter-rbac-proxy
+      port: 9443
+      protocol: tls
+      {{- if eq (include "eric-esoa-so.global-security-tls-enabled" .) "true" }}
+      validation:
+        caSecret: {{ .Values.ingress.tls.caSecret }}
+        subjectName: eric-esoa-so-domain-orch-adapter-rbac-proxy
+      {{- end }}
+    timeoutPolicy:
+      response: "300s"
+    rateLimitPolicy:
+    {{- toYaml .Values.ingress.rateLimitPolicy | nindent 6 }}
+
+
+
+{{- end }}
+{{- end }}

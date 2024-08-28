@@ -1,0 +1,205 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+
+{{- if .Values.alarms.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "eric-esoa-so.name" . }}-fault-mappings
+  labels:
+    bss.ericsson.com/bamFaultmapDelegate: "true"
+    {{- include "eric-esoa-so.kubernetes-io-info" .| nindent 4 }}
+  annotations:
+    {{- include "eric-esoa-so.helm-annotations" .| nindent 4 }}
+data:
+  eric-eo-orchestration-gui.json: |-
+    [
+      {
+          "faultName": "orchestrationGuiUnavailable",
+          "vendor": 193,
+          "code": 19726338,
+          "specificProblem": "Orchestration GUI Unavailable",
+          "category": "ProcessingErrorAlarm",
+          "probableCause": 356,
+          "defaultSeverity": "Critical",
+          "defaultDescription": "All replicas are down, service unavailable",
+          "defaultExpiration": 0
+      }
+    ]
+
+  eric-eo-orchestrationcockpit.json: |-
+    [
+      {
+          "faultName": "orchestrationCockpitUnavailable",
+          "vendor": 193,
+          "code": 19726338,
+          "specificProblem": "Orchestration Cockpit Unavailable",
+          "category": "ProcessingErrorAlarm",
+          "probableCause": 356,
+          "defaultSeverity": "Critical",
+          "defaultDescription": "All replicas are down, service unavailable",
+          "defaultExpiration": 0
+      }
+    ]
+
+  eric-eo-playbook-service.json: |-
+    [
+      {
+          "faultName": "playBookServiceUnavailable",
+          "vendor": 193,
+          "code": 19726338,
+          "specificProblem": "PlayBook Service Unavailable",
+          "category": "ProcessingErrorAlarm",
+          "probableCause": 356,
+          "defaultSeverity": "Critical",
+          "defaultDescription": "All replicas are down, service unavailable",
+          "defaultExpiration": 0
+      }
+    ]
+
+  eric-eo-so-nssmf-agent.json: |-
+    [
+      {
+          "faultName": "nssmfAgentUnavailable",
+          "vendor": 193,
+          "code": 19726338,
+          "specificProblem": "NSSMF Agent Unavailable",
+          "category": "ProcessingErrorAlarm",
+          "probableCause": 356,
+          "defaultSeverity": "Critical",
+          "defaultDescription": "All replicas are down, service unavailable",
+          "defaultExpiration": 0
+      }
+    ]
+
+  toscao.json: |-
+    [
+      {
+          "faultName": "toscaoUnavailable",
+          "vendor": 193,
+          "code": 19726338,
+          "specificProblem": "TOSCAO Unavailable",
+          "category": "ProcessingErrorAlarm",
+          "probableCause": 356,
+          "defaultSeverity": "Critical",
+          "defaultDescription": "All replicas are down, service unavailable",
+          "defaultExpiration": 0
+      }
+    ]
+
+  eric-eo-catalog-manager.json: |-
+    [
+      {
+          "faultName": "catalogManagerUnavailable",
+          "vendor": 193,
+          "code": 19726338,
+          "specificProblem": "Catalog Manager Unavailable",
+          "category": "ProcessingErrorAlarm",
+          "probableCause": 356,
+          "defaultSeverity": "Critical",
+          "defaultDescription": "All replicas are down, service unavailable",
+          "defaultExpiration": 0
+      }
+    ]
+
+  eric-eo-dashboard.json: |-
+    [
+      {
+          "faultName": "dashboardUnavailable",
+          "vendor": 193,
+          "code": 19726338,
+          "specificProblem": "Dashboard Unavailable",
+          "category": "ProcessingErrorAlarm",
+          "probableCause": 356,
+          "defaultSeverity": "Critical",
+          "defaultDescription": "All replicas are down, service unavailable",
+          "defaultExpiration": 0
+      }
+    ]
+
+  eric-oss-domain-orch-adapter.json: |-
+    [
+      {
+          "faultName": "domainOrchestrationAdapterUnavailable",
+          "vendor": 193,
+          "code": 19726338,
+          "specificProblem": "Domain Orchestration Adapter Unavailable",
+          "category": "ProcessingErrorAlarm",
+          "probableCause": 356,
+          "defaultSeverity": "Critical",
+          "defaultDescription": "All replicas are down, service unavailable",
+          "defaultExpiration": 0
+      },
+      {
+          "faultName": "connectedSystemDomainUnreachable",
+          "vendor": 193,
+          "code": 19726337,
+          "defaultDescription": "Unable to connect to specified domain.",
+          "defaultExpiration": 600,
+          "defaultSeverity": "Major",
+          "probableCause": 22,
+          "category": "CommunicationsAlarm",
+          "specificProblem": "Domain Orchestrator cannot connect to specified domain."
+      }
+    ]
+
+  eric-oss-tosca-orchestration-enabler.json: |-
+    [
+      {
+          "faultName": "toscaOrchestrationEnablerUnavailable",
+          "vendor": 193,
+          "code": 19726338,
+          "specificProblem": "Tosca Orchestration Enabler Unavailable",
+          "category": "ProcessingErrorAlarm",
+          "probableCause": 356,
+          "defaultSeverity": "Critical",
+          "defaultDescription": "All replicas are down, service unavailable",
+          "defaultExpiration": 0
+      }
+    ]
+
+  eric-esoa-key-management-agent.json: |-
+    [
+      {
+          "faultName": "keyManagementAgentUnavailable",
+          "vendor": 193,
+          "code": 19726338,
+          "specificProblem": "Key Management Agent Unavailable",
+          "category": "ProcessingErrorAlarm",
+          "probableCause": 356,
+          "defaultSeverity": "Critical",
+          "defaultDescription": "All replicas are down, service unavailable",
+          "defaultExpiration": 0
+      }
+    ]
+
+  eric-esoa-so.json: |-
+    [
+      {
+          "faultName": "connectionEstablishmentError",
+          "vendor": 193,
+          "code": 19726338,
+          "specificProblem": "Connection could not be established",
+          "category": "CommunicationsAlarm",
+          "probableCause": 22,
+          "defaultSeverity": "Major",
+          "defaultDescription": "An error occurred during the establishment of connection",
+          "defaultExpiration": 600
+      }
+    ]
+
+{{- end }}

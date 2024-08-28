@@ -1,0 +1,29 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+{{- if eq (include "eric-esoa-so-library-chart.global-security-tls-enabled" .) "true" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "eric-esoa-so-library-chart.name" . }}-truststore-configmap
+  labels:
+  {{- include "eric-esoa-so-library-chart.labels" .| nindent 4 }}
+  annotations:
+  {{- $productInfo := include "eric-esoa-so-library-chart.helm-annotations" . | fromYaml -}}
+  {{- $config := include "eric-esoa-so-library-chart.config-annotations" . | fromYaml -}}
+  {{ include "eric-esoa-so-library-chart.mergeAnnotations" (dict "location" .Template.Name "sources" (list $productInfo $config)) | trim | nindent 4 }}
+  {{- include "eric-esoa-so-library-chart.truststore-configmap-data" .| nindent 0}}
+{{- end }}

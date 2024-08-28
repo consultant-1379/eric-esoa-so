@@ -1,0 +1,120 @@
+apiVersion: v2
+dependencies:
+- condition: eric-eo-catalog-manager.enabled
+  name: eric-eo-catalog-manager
+  repository: https://arm.sero.gic.ericsson.se/artifactory/proj-so-gs-all-helm
+  tags:
+  - eric-eo-catalog-manager
+  version: 5.6.0-1
+- alias: eric-esoa-catalog-manager-rbac-proxy
+  condition: eric-eo-catalog-manager.enabled
+  name: eric-bss-kube-rbac-proxy
+  repository: https://arm.seli.gic.ericsson.se/artifactory/proj-bam-released-helm/
+  tags:
+  - eric-eo-catalog-manager
+  version: 1.46.0+7
+- condition: eric-eo-dashboard.enabled
+  name: eric-eo-dashboard
+  repository: https://arm.sero.gic.ericsson.se/artifactory/proj-so-gs-all-helm
+  tags:
+  - eric-eo-dashboard
+  version: 3.7.0-1
+- alias: eric-esoa-so-dashboard-rbac-proxy
+  condition: eric-eo-dashboard.enabled
+  name: eric-bss-kube-rbac-proxy
+  repository: https://arm.seli.gic.ericsson.se/artifactory/proj-bam-released-helm/
+  tags:
+  - eric-eo-dashboard
+  version: 1.46.0+7
+- condition: eric-eo-so-nssmf-agent.enabled
+  name: eric-eo-so-nssmf-agent
+  repository: https://arm.sero.gic.ericsson.se/artifactory/proj-so-gs-all-helm
+  tags:
+  - eric-eo-so-nssmf-agent
+  version: 5.6.0-1
+- alias: eric-esoa-so-nssmf-agent-rbac-proxy
+  condition: eric-eo-so-nssmf-agent.enabled
+  name: eric-bss-kube-rbac-proxy
+  repository: https://arm.seli.gic.ericsson.se/artifactory/proj-bam-released-helm/
+  tags:
+  - eric-eo-so-nssmf-agent
+  version: 1.46.0+7
+- condition: eric-eo-orchestrationcockpit.enabled
+  name: eric-eo-orchestrationcockpit
+  repository: https://arm.sero.gic.ericsson.se/artifactory/proj-so-gs-all-helm
+  tags:
+  - eric-eo-orchestrationcockpit
+  version: 5.5.6-1
+- alias: eric-esoa-so-orchestrationcockpit-rbac-proxy
+  condition: eric-eo-orchestrationcockpit.enabled
+  name: eric-bss-kube-rbac-proxy
+  repository: https://arm.seli.gic.ericsson.se/artifactory/proj-bam-released-helm/
+  tags:
+  - eric-eo-orchestrationcockpit
+  version: 1.46.0+7
+- condition: eric-eo-orchestration-gui.enabled
+  name: eric-eo-orchestration-gui
+  repository: https://arm.sero.gic.ericsson.se/artifactory/proj-so-gs-all-helm
+  tags:
+  - eric-eo-orchestration-gui
+  version: 4.7.0-2
+- alias: eric-esoa-so-orch-gui-rbac-proxy
+  condition: eric-eo-orchestration-gui.enabled
+  name: eric-bss-kube-rbac-proxy
+  repository: https://arm.seli.gic.ericsson.se/artifactory/proj-bam-released-helm/
+  tags:
+  - eric-eo-orchestration-gui
+  version: 1.46.0+7
+- condition: eric-eo-playbook-service.enabled
+  name: eric-eo-playbook-service
+  repository: https://arm.sero.gic.ericsson.se/artifactory/proj-so-gs-all-helm
+  tags:
+  - eric-eo-playbook-service
+  version: 5.6.0-1
+- condition: toscao.enabled
+  name: toscao
+  repository: https://arm.rnd.ki.sw.ericsson.se/artifactory/proj-adp-helm-dev-generic-local/cd/sandbox/toscao/
+  tags:
+  - toscao
+  version: 2.1.10-1
+- alias: toscao-database-pg
+  condition: toscao.enabled
+  name: eric-data-document-database-pg
+  repository: https://arm.sero.gic.ericsson.se/artifactory/proj-adp-gs-all-helm/
+  tags:
+  - toscao-database-pg
+  version: 9.2.0+44
+- condition: eric-oss-domain-orch-adapter.enabled
+  name: eric-oss-domain-orch-adapter
+  repository: https://arm.sero.gic.ericsson.se/artifactory/proj-so-gs-all-helm
+  tags:
+  - eric-oss-domain-orch-adapter
+  version: 5.7.1-1
+- alias: eric-esoa-so-domain-orch-adapter-rbac-proxy
+  condition: eric-oss-domain-orch-adapter.enabled
+  name: eric-bss-kube-rbac-proxy
+  repository: https://arm.seli.gic.ericsson.se/artifactory/proj-bam-released-helm/
+  tags:
+  - eric-oss-domain-orch-adapter
+  version: 1.46.0+7
+- name: eric-oss-tosca-orchestration-enabler
+  repository: https://arm.sero.gic.ericsson.se/artifactory/proj-so-gs-all-helm
+  tags:
+  - eric-oss-tosca-orchestration-enabler
+  version: 4.7.0-1
+- condition: eric-esoa-key-management-agent.enabled
+  name: eric-esoa-key-management-agent
+  repository: https://arm.sero.gic.ericsson.se/artifactory/proj-so-gs-all-helm
+  version: 2.6.1-1
+- alias: eric-esoa-key-management-agent-rbac-proxy
+  condition: eric-esoa-key-management-agent.enabled
+  name: eric-bss-kube-rbac-proxy
+  repository: https://arm.seli.gic.ericsson.se/artifactory/proj-bam-released-helm/
+  tags:
+  - eric-esoa-key-management-agent
+  version: 1.46.0+7
+- name: eric-esoa-so-library-chart
+  repository: https://arm.sero.gic.ericsson.se/artifactory/proj-so-gs-all-helm-local
+  version: 2.2.2-1
+name: eric-esoa-so
+version: 0.11.40-1

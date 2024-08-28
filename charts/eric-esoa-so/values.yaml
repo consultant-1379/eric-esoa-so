@@ -1,0 +1,537 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+global:
+  networkPolicy:
+    enabled: true
+  ingress:
+    baseHostname:
+    ingressClass:
+  hosts:
+    eric-esoa-so:
+  registry:
+    imagePullPolicy: IfNotPresent
+    url: armdocker.rnd.ericsson.se
+    username: ARM_USERNAME
+    password: ARM_PASSWORD
+  iam:
+    adminSecret: eric-sec-access-mgmt-creds
+    userKey: kcadminid
+    passwordKey: kcpasswd
+    tlsSecret: iam-tls-secret
+    cacert:
+      secretName: eric-bss-bam-oam-external-server-cert
+      key: ca.crt
+      filePath: iam/ca.crt
+  systemUser:
+    secret: eric-esoa-system-user-secret
+    userKey: system-user
+    passwordKey: system-user-pwd
+  logShipper:
+    deployment:
+      type: "sidecar"
+  createDB: false
+
+tolerations: []
+
+terminationGracePeriodSeconds: 30 # default
+
+imageCredentials:
+  # repoPath include the image path relative to the registry url, excluding image name
+  repoPath: proj-orchestration-so
+  pullPolicy: IfNotPresent
+  registry:
+    url:
+  # overrides global registry
+  #url: armdocker.companyA.se
+  iamClient:
+    registry:
+      url:
+    repoPath: proj-esoa-so
+  bpmnWorkflowUpload:
+    registry:
+      url:
+    repoPath: proj-esoa-so
+
+eoc:
+  eocAdmin:
+    fqdnPrefix: eric-eoc-services
+    port: 443
+  pc:
+    secret:
+      name: "esoa-eoc-processcontroller-secret"
+      userKey: "pcSystemUsername"
+      passwordKey: "pcSystemPassword"
+  tls:
+    enabled: true
+
+ingress:
+  enabled: false
+  iccr:
+    enabled: true
+  ingressClass:
+  fqdnPrefix: &fqdnPrefix so
+  tls:
+    enabled: true
+    secretName: so-tls-secret
+    passthrough: false
+    caSecret: eric-sec-sip-tls-trusted-root-cert
+  rateLimitPolicy:
+    local:
+      requests: 500
+      unit: second
+
+eric-eo-orchestrationcockpit:
+  enabled: true
+  logging:
+    format:
+      json: true
+  labels:
+    eric-esoa-so-rbac-proxy-access: "true"
+
+eric-eo-dashboard:
+  enabled: true
+  logging:
+    format:
+      json: true
+  labels:
+    eric-esoa-so-rbac-proxy-access: "true"
+
+eric-eo-catalog-manager:
+  enabled: true
+  database:
+    host: edb
+    port: 5444
+    secret: edb-users-secret
+  probe:
+    readiness:
+      failureThreshold: 50
+    liveness:
+      failureThreshold: 50
+  logging:
+    format:
+      json: true
+  labels:
+    eric-esoa-so-rbac-proxy-access: "true"
+  kafka:
+    bootstrapServer: eric-esoa-platform-message-bus-kf:9092
+    bootstrapServerTls: eric-esoa-platform-message-bus-kf:9093
+
+eric-oss-tosca-orchestration-enabler:
+  database:
+    host: edb
+    port: 5444
+    secret: edb-users-secret
+
+eric-eo-playbook-service:
+  probes:
+    playbookService:
+      readinessProbe:
+        failureThreshold: 50
+      livenessProbe:
+        failureThreshold: 50
+  logging:
+    format:
+      json: true
+  httpClient:
+    cacert:
+      secretName: eric-esoa-so-ca-external-cert
+  kafka:
+    bootstrapServers: eric-esoa-platform-message-bus-kf:9092
+    bootstrapServersTls: eric-esoa-platform-message-bus-kf:9093
+  database:
+    host: edb
+    port: 5444
+    secret: edb-users-secret
+  duplicateRequestDetection:
+    enabled: true
+    dataValidity:
+      enabled: true
+      retention: 7D
+      interval: 24H
+
+eric-eo-so-nssmf-agent:
+  enabled: true
+  logging:
+    format:
+      json: true
+  labels:
+    eric-esoa-so-rbac-proxy-access: "true"
+  duplicateRequestDetection:
+    enabled: true
+
+eric-eo-orchestration-gui:
+  enabled: true
+  fqdnPrefix: *fqdnPrefix
+  imageCredentials:
+    mainImage:
+      soVersion: 2.11.0-586
+  global:
+    udsEnabled: true
+    sddEnabled: false
+  labels:
+    eric-esoa-so-rbac-proxy-access: "true"
+
+toscao-database-pg:
+  brAgent:
+    enabled: true
+    backupTypeList:
+      - "GR"
+      - "PLATFORM"
+  credentials:
+    kubernetesSecretName: eric-eo-database-pg-secret
+  postgresDatabase: toscao
+  postgresConfig:
+    max_prepared_transactions: 100
+  persistentVolumeClaim:
+    enabled: true
+    backup:
+      enabled: false
+  resources:
+    postgres:
+      limits:
+        ephemeral-storage: 100Mi
+      requests:
+        ephemeral-storage: 100Mi
+  service:
+    endpoints:
+      postgres:
+        tls:
+          enforced: optional
+      postgresExporter:
+        tls:
+          enforced: optional
+
+toscao:
+  images:
+    toscao:
+      resources:
+        limits:
+          cpu: 0
+      env:
+        toscao_csar_storage: false
+  registration:
+    hook:
+      enabled : true
+  persistentVolumeClaim:
+    storageClassName: ""
+    accessMode: "ReadWriteOnce"
+    size: 1Gi
+  strategyType: Recreate
+  service:
+    port: 80
+  existingDatabase: toscao-database-pg
+  postgresql:
+    enabled: false
+    postgresDatabase: toscao
+    existingSecret:
+      name: eric-eo-database-pg-secret
+      userKey: custom-user
+      pwdKey: custom-pwd
+  hooks:
+    csarPreProcessHook:
+      cfgMap: eric-esoa-so-toscao-hook
+
+eric-oss-domain-orch-adapter:
+  database:
+    host: edb
+    port: 5444
+    secret: edb-users-secret
+  enabled: true
+  sbi:
+    httpClient:
+      cacert:
+        secretName: eric-esoa-so-ca-external-cert
+  kafka:
+    bootstrapServers: http://eric-esoa-platform-message-bus-kf:9092
+    bootstrapServersTls: https://eric-esoa-platform-message-bus-kf:9093
+  duplicateRequestDetection:
+    enabled: true
+    dataValidity:
+      enabled: true
+      retention: 7D
+      interval: 24H
+
+networkPolicy:
+  enabled: false
+
+certificates:
+  enabled: true
+  duration: 720h
+  renewBefore: 360h
+  ca:
+    enabled: true
+    issuer: eric-esoa-so-external-issuer
+    duration: 87600h # 10y
+    renewBefore: 8760h # 1y
+  subject:
+    organizations:
+      - "Ericsson"
+    organizationalUnits:
+      - "BOS"
+  external:
+    secret:
+      enabled: true
+
+iam:
+  ca:
+    secretName: eric-bss-bam-oam-external-server-cert
+    key: ca.crt
+    filePath: iam/ca.crt
+
+alarms:
+  enabled: true
+
+rbac:
+  label: &rbacLabel eric-esoa-so-rbac
+  oamLabel: oam-rbac
+
+eric-esoa-so-nssmf-agent-rbac-proxy:
+  config:
+    upstream:
+      url: https://eric-eo-so-nssmf-agent
+      noTlsUrl: http://eric-eo-so-nssmf-agent:8080
+      issuerRef: eric-bos-esoa-common-client-ca
+    oidcAuth:
+      enabled: true
+      caSecret: eric-bss-bam-oam-oidc-ca-bundle
+      removeAuthenticatedToken: false # To propogate the token to upstream services
+      groupsClaim: iam_roles
+    rbac:
+      globalRolePolicyCmLabel: *rbacLabel
+    tls:
+      existingSecret: eric-bss-bam-oam-external-server-cert
+      privateKey: tls.key
+      certKey: tls.crt
+      caKey: ca.crt
+  enabled: true
+  ingress:
+    enabled: false
+  networkPolicy:
+    egress:
+      accessLabels:
+        rbacProxy:
+          # Service labels to denote access from this proxy
+          eric-esoa-so-rbac-proxy-access: "true"
+  replicaCount: 1
+
+eric-esoa-so-dashboard-rbac-proxy:
+  config:
+    upstream:
+      url: https://eric-eo-dashboard
+      noTlsUrl: http://eric-eo-dashboard
+      issuerRef: eric-bos-esoa-common-client-ca
+    oidcAuth:
+      enabled: true
+      clientId: AuthorizationClient
+      caSecret: eric-bss-bam-oam-oidc-ca-bundle
+      removeAuthenticatedToken: false
+      groupsClaim: iam_roles
+    rbac:
+      globalRolePolicyCmLabel: *rbacLabel
+    tls:
+      existingSecret: eric-bss-bam-oam-external-server-cert
+      privateKey: tls.key
+      certKey: tls.crt
+      caKey: ca.crt
+  enabled: true
+  ingress:
+    enabled: false
+  nameOverride: eric-esoa-so-dashboard-rbac-proxy   # A unique name given for this rbac proxy
+  networkPolicy:
+    egress:
+      accessLabels:
+        rbacProxy:
+          eric-esoa-so-rbac-proxy-access: "true"
+  replicaCount: 1
+
+eric-esoa-catalog-manager-rbac-proxy:
+  config:
+    upstream:
+      url: https://eric-eo-catalog-manager
+      noTlsUrl: http://eric-eo-catalog-manager
+      issuerRef: eric-bos-esoa-common-client-ca
+    oidcAuth:
+      enabled: true
+      caSecret: eric-bss-bam-oam-oidc-ca-bundle
+      removeAuthenticatedToken: false
+      groupsClaim: iam_roles
+    tls:
+      existingSecret: eric-bss-bam-oam-external-server-cert
+      privateKey: tls.key
+      certKey: tls.crt
+      caKey: ca.crt
+    rbac:
+      globalRolePolicyCmLabel: *rbacLabel
+  enabled: true
+  ingress:
+    enabled: false
+  networkPolicy:
+    egress:
+      accessLabels:
+        rbacProxy:
+          eric-esoa-so-rbac-proxy-access: "true"
+  replicaCount: 1
+
+eric-esoa-so-orch-gui-rbac-proxy:
+  config:
+    upstream:
+      url: https://eric-eo-orchestration-gui
+      noTlsUrl: http://eric-eo-orchestration-gui
+      issuerRef: eric-bos-esoa-common-client-ca
+    oidcAuth:
+      enabled: true
+      caSecret: eric-bss-bam-oam-oidc-ca-bundle
+      groupsClaim: iam_roles
+    rbac:
+      globalRolePolicyCmLabel: *rbacLabel
+    tls:
+      existingSecret: eric-bss-bam-oam-external-server-cert
+      privateKey: tls.key
+      certKey: tls.crt
+      caKey: ca.crt
+  enabled: true
+  ingress:
+    enabled: false
+  networkPolicy:
+    egress:
+      accessLabels:
+        rbacProxy:
+          eric-esoa-so-rbac-proxy-access: "true"
+  replicaCount: 1
+
+eric-esoa-so-orchestrationcockpit-rbac-proxy:
+  config:
+    upstream:
+      url: https://eric-eo-orchestrationcockpit
+      noTlsUrl: http://eric-eo-orchestrationcockpit
+      issuerRef: eric-bos-esoa-common-client-ca
+    oidcAuth:
+      enabled: true
+      clientId: AuthorizationClient
+      caSecret: eric-bss-bam-oam-oidc-ca-bundle
+      removeAuthenticatedToken: false
+      groupsClaim: iam_roles
+    rbac:
+      globalRolePolicyCmLabel: *rbacLabel
+    tls:
+      existingSecret: eric-bss-bam-oam-external-server-cert
+      privateKey: tls.key
+      certKey: tls.crt
+      caKey: ca.crt
+  enabled: true
+  ingress:
+    enabled: false
+  networkPolicy:
+    egress:
+      accessLabels:
+        rbacProxy:
+          eric-esoa-so-rbac-proxy-access: "true"
+  replicaCount: 1
+
+eric-esoa-key-management-agent-rbac-proxy:
+  config:
+    upstream:
+      url: https://eric-esoa-key-management-agent
+      noTlsUrl: http://eric-esoa-key-management-agent
+      issuerRef: eric-bos-esoa-common-client-ca
+    oidcAuth:
+      enabled: true
+      caSecret: eric-bss-bam-oam-oidc-ca-bundle
+      removeAuthenticatedToken: false
+      groupsClaim: iam_roles
+    rbac:
+      globalRolePolicyCmLabel: *rbacLabel
+    tls:
+      existingSecret: eric-bss-bam-oam-external-server-cert
+      privateKey: tls.key
+      certKey: tls.crt
+      caKey: ca.crt
+  enabled: true
+  ingress:
+    enabled: false
+  networkPolicy:
+    egress:
+      accessLabels:
+        rbacProxy:
+          eric-esoa-so-rbac-proxy-access: "true"
+  replicaCount: 1
+
+eric-esoa-so-domain-orch-adapter-rbac-proxy:
+  config:
+    upstream:
+      url: https://eric-oss-domain-orch-adapter
+      noTlsUrl: http://eric-oss-domain-orch-adapter
+      issuerRef: eric-bos-esoa-common-client-ca
+    oidcAuth:
+      enabled: true
+      caSecret: eric-bss-bam-oam-oidc-ca-bundle
+      removeAuthenticatedToken: false
+      groupsClaim: iam_roles
+    rbac:
+      globalRolePolicyCmLabel: *rbacLabel
+    tls:
+      existingSecret: eric-bss-bam-oam-external-server-cert
+      privateKey: tls.key
+      certKey: tls.crt
+      caKey: ca.crt
+  enabled: true
+  ingress:
+    enabled: false
+  networkPolicy:
+    egress:
+      accessLabels:
+        rbacProxy:
+          eric-esoa-so-rbac-proxy-access: "true"
+  replicaCount: 1
+
+eric-esoa-key-management-agent:
+  enabled: true
+
+workflows:
+  enabled: true
+  retries: 5
+  eocTLS:
+    secretName: eric-eoc-services-tls-secret
+    key: tls.crt
+    filePath: iam/ca.crt
+
+clients:
+  esd:
+    url: "http://eric-oss-cmn-topology-svc-core:8080"
+
+security:
+  config:
+    mountPath: /app/config/
+    fileName: truststore.yaml
+  truststore:
+    path: tmp/truststore.jks
+    caCertDirectory: /var/run/secrets/truststore/
+    certificates:
+      - secretName: eric-sec-sip-tls-trusted-root-cert
+        fileName: ca.crt
+      - secretName: eric-bos-esoa-common-client-ca-secret
+        fileName: ca.crt
+  keystore:
+    keyStoreSecretName: eric-esoa-so-int-cert
+    tlsCertDirectory: /var/run/secrets/eric-esoa-so-create-esd-nd-superuser-int-cert/
+    tlsCertFile: tls.crt
+    tlsKeyFile: tls.key
+
+ctsCredentialsSecret:
+  name: eric-oss-cmn-topology-svc-core-adminuser-credentials
+  usernameKey: technicalUser.name
+  passwordKey: technicalUser.password

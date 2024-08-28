@@ -1,0 +1,217 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+
+{{- if index .Values "eric-eo-orchestrationcockpit" "enabled" }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ template "eric-esoa-so.name" . }}-orchestrationcockpit-rbac-configmap
+  labels:
+    app: {{ template "eric-esoa-so.name" . }}
+    {{- include "eric-esoa-so.kubernetes-io-info" .| nindent 4 }}
+    com.ericsson.bss/bam-global-rbac: {{ .Values.rbac.label }}
+  annotations:
+    {{- include "eric-esoa-so.helm-annotations" .| nindent 4 }}
+data:
+  rbac: |
+    policy:
+      orchestrationcockpit-readOnly-role-1:
+        PType: p
+        V0: SOReadOnly
+        V1: /orchestrationcockpit/v1/workflow/engine-rest/*
+        V2: get
+      orchestrationcockpit-user-role-1:
+        PType: p
+        V0: SOUser
+        V1: /orchestrationcockpit/eso/v1.0/*
+        V2: get
+      orchestrationcockpit-user-role-2:
+        PType: p
+        V0: SOUser
+        V1: /orchestrationcockpit/eso/v1.0/*
+        V2: create
+      orchestrationcockpit-user-role-3:
+        PType: p
+        V0: SOUser
+        V1: /orchestrationcockpit/eso/v1.0/*
+        V2: update
+      orchestrationcockpit-user-role-4:
+        PType: p
+        V0: SOUser
+        V1: /orchestrationcockpit/eso/v1.0/*
+        V2: delete
+      orchestrationcockpit-admin-role-1:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /orchestrationcockpit/eso/v1.0/*
+        V2: get
+      orchestrationcockpit-admin-role-2:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /orchestrationcockpit/eso/v1.0/*
+        V2: create
+      orchestrationcockpit-admin-role-3:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /orchestrationcockpit/eso/v1.0/*
+        V2: update
+      orchestrationcockpit-admin-role-4:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /orchestrationcockpit/eso/v1.0/*
+        V2: delete
+      orchestrationcockpit-designer-role-1:
+        PType: p
+        V0: SODesigner
+        V1: /orchestrationcockpit/eso/v1.0/*
+        V2: get
+      orchestrationcockpit-designer-role-2:
+        PType: p
+        V0: SODesigner
+        V1: /orchestrationcockpit/eso/v1.0/*
+        V2: create
+      orchestrationcockpit-designer-role-3:
+        PType: p
+        V0: SODesigner
+        V1: /orchestrationcockpit/eso/v1.0/*
+        V2: update
+      orchestrationcockpit-designer-role-4:
+        PType: p
+        V0: SODesigner
+        V1: /orchestrationcockpit/eso/v1.0/*
+        V2: delete
+      orchestrationcockpit-readOnly-role-2:
+        PType: p
+        V0: SOReadOnly
+        V1: /orchestrationcockpit/eso/v1.0/*
+        V2: get
+      orchestrationcockpit-user-role-5:
+        PType: p
+        V0: SOUser
+        V1: /orchestrationcockpit/v1/operations/*
+        V2: get
+      orchestrationcockpit-user-role-6:
+        PType: p
+        V0: SOUser
+        V1: /orchestrationcockpit/v1/operations/*
+        V2: create
+      orchestrationcockpit-admin-role-5:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /orchestrationcockpit/v1/operations/*
+        V2: get
+      orchestrationcockpit-admin-role-6:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /orchestrationcockpit/v1/operations/*
+        V2: create
+      orchestrationcockpit-designer-role-5:
+        PType: p
+        V0: SODesigner
+        V1: /orchestrationcockpit/v1/operations/*
+        V2: get
+      orchestrationcockpit-designer-role-6:
+        PType: p
+        V0: SODesigner
+        V1: /orchestrationcockpit/v1/operations/*
+        V2: create
+      orchestrationcockpit-readOnly-role-3:
+        PType: p
+        V0: SOReadOnly
+        V1: /orchestrationcockpit/v1/operations/*
+        V2: get
+      orchestrationcockpit-user-role-7:
+        PType: p
+        V0: SOUser
+        V1: /orchestrationcockpit/v1/services/*
+        V2: get
+      orchestrationcockpit-admin-role-7:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /orchestrationcockpit/v1/services/*
+        V2: get
+      orchestrationcockpit-user-role-8:
+        PType: p
+        V0: SOUser
+        V1: /orchestrationcockpit/v1/actions/*
+        V2: get
+      orchestrationcockpit-admin-role-8:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /orchestrationcockpit/v1/actions/*
+        V2: get
+      orchestrationcockpit-designer-role-7:
+        PType: p
+        V0: SODesigner
+        V1: /orchestrationcockpit/v1/actions/*
+        V2: get
+      orchestrationcockpit-readOnly-role-4:
+        PType: p
+        V0: SOReadOnly
+        V1: /orchestrationcockpit/v1/actions/*
+        V2: get
+      orchestrationcockpit-user-role-9:
+        PType: p
+        V0: SOUser
+        V1: /orchestrationcockpit/v1/service-models/*
+        V2: get
+      orchestrationcockpit-admin-role-9:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /orchestrationcockpit/v1/service-models/*
+        V2: get
+      orchestrationcockpit-designer-role-8:
+        PType: p
+        V0: SODesigner
+        V1: /orchestrationcockpit/v1/service-models/*
+        V2: get
+      orchestrationcockpit-readOnly-role-5:
+        PType: p
+        V0: SOReadOnly
+        V1: /orchestrationcockpit/v1/service-models/*
+        V2: get
+      orchestrationcockpit-user-role-10:
+        PType: p
+        V0: SOUser
+        V1: /orchestrationcockpit/v1/workflow/engine-rest/*
+        V2: get
+      orchestrationcockpit-user-role-11:
+        PType: p
+        V0: SOUser
+        V1: /orchestrationcockpit/v1/workflow/engine-rest/*
+        V2: create
+      orchestrationcockpit-admin-role-10:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /orchestrationcockpit/v1/workflow/engine-rest/*
+        V2: get
+      orchestrationcockpit-admin-role-11:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /orchestrationcockpit/v1/workflow/engine-rest/*
+        V2: create
+      orchestrationcockpit-designer-role-9:
+        PType: p
+        V0: SODesigner
+        V1: /orchestrationcockpit/v1/workflow/engine-rest/*
+        V2: get
+      orchestrationcockpit-designer-role-10:
+        PType: p
+        V0: SODesigner
+        V1: /orchestrationcockpit/v1/workflow/engine-rest/*
+        V2: create
+{{- end }}

@@ -1,0 +1,63 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+
+  {{- if index .Values "eric-esoa-key-management-agent" "enabled" }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ template "eric-esoa-so.name" . }}-key-management-agent-rbac-configmap
+  labels:
+    app: {{ template "eric-esoa-so.name" . }}
+  {{- include "eric-esoa-so.kubernetes-io-info" .| nindent 4 }}
+    com.ericsson.bss/bam-global-rbac: {{ .Values.rbac.label }}
+  annotations:
+  {{- include "eric-esoa-so.helm-annotations" .| nindent 4 }}
+data:
+  rbac: |
+    policy:
+      kma-admin-1:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /v1/configuration/credentials*
+        V2: update
+      kma-admin-2:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /v1/configuration/credentials*
+        V2: create
+      kma-admin-3:
+        PType: p
+        V0: SOProviderAdmin
+        V1: /v1/configuration/credentials*
+        V2: delete
+      kma-designer-1:
+        PType: p
+        V0: SODesigner
+        V1: /v1/configuration/credentials*
+        V2: update
+      kma-designer-2:
+        PType: p
+        V0: SODesigner
+        V1: /v1/configuration/credentials*
+        V2: create
+      kma-designer-3:
+        PType: p
+        V0: SODesigner
+        V1: /v1/configuration/credentials*
+        V2: delete
+
+  {{- end }}
